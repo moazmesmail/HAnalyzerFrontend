@@ -1,187 +1,69 @@
-import PauseIcon from "@mui/icons-material/Pause";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
-import ReplayIcon from "@mui/icons-material/Replay";
-import {
-  Alert,
-  Box,
-  Button,
-  Chip,
-  CircularProgress,
-  Divider,
-  IconButton,
-  Paper,
-  Slider,
-  Stack,
-  Typography
-} from "@mui/material";
+import { Alert, Box, Button, Chip, CircularProgress, Paper, Stack, Typography } from "@mui/material";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useRef, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useState } from "react";
+import { Link as RouterLink, useParams } from "react-router-dom";
 import { getErrorMessage } from "../../../shared/api/errors";
 import { useSession } from "../../auth/session";
-import { getVideo, previewUrl, retryVideoPreparation } from "../api";
+import { getVideo, originalUrl, startVideoAnalysis } from "../api";
 import { videoKeys } from "../queries";
 
 export function VideoDetailPage() {
   const { videoId } = useParams();
   const session = useSession();
   const queryClient = useQueryClient();
-
+  const [playbackError, setPlaybackError] = useState(false);
   const video = useQuery({
     queryKey: videoKeys.detail(session.user?.id, videoId),
     queryFn: () => getVideo(videoId ?? ""),
-    enabled: Boolean(videoId)
+    enabled: Boolean(videoId),
+    refetchInterval: (query) => query.state.data?.preparation_status === "preparing" ? 2000 : false
   });
-
-  const retry = useMutation({
-    mutationFn: () => retryVideoPreparation(videoId ?? "", session.csrfToken),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: videoKeys.detail(session.user?.id, videoId) });
+  const analyze = useMutation({
+    mutationFn: () => startVideoAnalysis(videoId ?? "", session.csrfToken),
+    onSuccess: async (updated) => {
+      queryClient.setQueryData(videoKeys.detail(session.user?.id, videoId), updated);
       await queryClient.invalidateQueries({ queryKey: videoKeys.list(session.user?.id) });
     }
   });
-
   const currentVideo = video.data;
-  const currentPreviewUrl = currentVideo ? previewUrl(currentVideo) : null;
+  const src = currentVideo ? originalUrl(currentVideo) : null;
+  const processing = currentVideo?.preparation_status === "preparing" || analyze.isPending;
 
   return (
     <Stack spacing={3}>
+      <Button component={RouterLink} to="/app/videos" sx={{ alignSelf: "flex-start" }}>Back to my videos</Button>
       {video.isLoading && <CircularProgress aria-label="Loading video" />}
       {video.isError && <Alert severity="error">{getErrorMessage(video.error)}</Alert>}
-      {retry.isError && <Alert severity="error">{getErrorMessage(retry.error)}</Alert>}
-
-      {currentVideo && (
-        <>
-          <Stack direction="row" spacing={2} sx={{ alignItems: "center" }}>
-            <Typography variant="h4" component="h1" sx={{ flexGrow: 1 }}>
-              {currentVideo.original_filename}
-            </Typography>
-            <Chip label={currentVideo.preparation_status} />
+      {currentVideo && <>
+        <Typography variant="h4" component="h1" sx={{ overflowWrap: "anywhere" }}>{currentVideo.original_filename}</Typography>
+        <Paper sx={{ p: 2 }}>
+          <Stack spacing={2}>
+            <Typography variant="h6">Original video</Typography>
+            <Typography color="text.secondary">Uploaded {new Date(currentVideo.created_at).toLocaleString()} · Original quality and audio preserved</Typography>
+            {src ? <>
+              <Box component="video" key={src} src={src} crossOrigin="use-credentials" controls playsInline preload="metadata"
+                onLoadedMetadata={() => setPlaybackError(false)} onError={() => setPlaybackError(true)}
+                sx={{ width: "100%", maxHeight: 560, bgcolor: "black" }} />
+              {playbackError && <Alert severity="warning">This video could not be played. Your browser may not support its original format. You can open the original file below.</Alert>}
+              <Button component="a" href={src} target="_blank" rel="noopener" sx={{ alignSelf: "flex-start" }}>Open original file</Button>
+            </> : <Alert severity="warning">Original video is unavailable.</Alert>}
           </Stack>
-
-          <Paper sx={{ p: 2 }}>
-            <Stack spacing={1}>
-              <Typography>Uploaded: {new Date(currentVideo.created_at).toLocaleString()}</Typography>
-              <Typography>Duration: {formatDuration(currentVideo.duration_seconds)}</Typography>
-              {currentVideo.preparation_error && (
-                <Alert severity="warning">{currentVideo.preparation_error}</Alert>
-              )}
-              {currentVideo.preparation_retryable && (
-                <Button
-                  startIcon={<ReplayIcon />}
-                  onClick={() => retry.mutate()}
-                  disabled={retry.isPending}
-                  variant="outlined"
-                >
-                  Retry preparation
-                </Button>
-              )}
-            </Stack>
-          </Paper>
-
-          <Paper sx={{ p: 2 }}>
-            <Stack spacing={2}>
-              <Typography variant="h6">Silent preview</Typography>
-              {currentPreviewUrl ? (
-                <SilentPreview src={currentPreviewUrl} />
-              ) : (
-                <Alert severity="info">Preview is not available yet.</Alert>
-              )}
-            </Stack>
-          </Paper>
-
-          <Paper sx={{ p: 2 }}>
-            <Stack spacing={2}>
-              <Typography variant="h6">Analysis</Typography>
-              <Alert severity="info">Analysis functionality is not implemented in this frontend slice yet.</Alert>
-              <Divider />
-              <Typography color="text.secondary">
-                The video workspace is ready for future analysis setup and status screens.
-              </Typography>
-            </Stack>
-          </Paper>
-        </>
-      )}
+        </Paper>
+        <Paper sx={{ p: 2 }}>
+          <Stack spacing={2}>
+            <Typography variant="h6">Analysis</Typography>
+            <Chip sx={{ alignSelf: "flex-start" }} label={processing ? "Preparing video" : currentVideo.preparation_status === "ready" ? "Visual input prepared" : currentVideo.preparation_status === "failed" ? "Preparation failed" : "Not started"} />
+            <Typography color="text.secondary">Start analyzing prepares a silent visual copy for analysis. Competition analysis results are not available yet.</Typography>
+            {currentVideo.preparation_error && <Alert severity="error">{currentVideo.preparation_error}</Alert>}
+            {analyze.isError && <Alert severity="error">{getErrorMessage(analyze.error)}</Alert>}
+            <Button variant="contained" startIcon={processing ? <CircularProgress size={18} color="inherit" /> : <PlayArrowIcon />}
+              disabled={!src || processing || currentVideo.preparation_status === "ready"} onClick={() => analyze.mutate()} sx={{ alignSelf: "flex-start" }}>
+              {processing ? "Preparing…" : currentVideo.preparation_status === "ready" ? "Visual input prepared" : currentVideo.preparation_status === "failed" ? "Retry analyzing" : "Start analyzing"}
+            </Button>
+          </Stack>
+        </Paper>
+      </>}
     </Stack>
   );
-}
-
-function SilentPreview({ src }: { src: string }) {
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [duration, setDuration] = useState(0);
-  const [currentTime, setCurrentTime] = useState(0);
-
-  async function togglePlayback() {
-    const video = videoRef.current;
-
-    if (!video) {
-      return;
-    }
-
-    if (video.paused) {
-      await video.play();
-      setIsPlaying(true);
-      return;
-    }
-
-    video.pause();
-    setIsPlaying(false);
-  }
-
-  function seekTo(value: number) {
-    const video = videoRef.current;
-
-    if (!video) {
-      return;
-    }
-
-    video.currentTime = value;
-    setCurrentTime(value);
-  }
-
-  return (
-    <Stack spacing={1}>
-      <Box
-        component="video"
-        ref={videoRef}
-        src={src}
-        muted
-        playsInline
-        onLoadedMetadata={(event) => setDuration(event.currentTarget.duration || 0)}
-        onTimeUpdate={(event) => setCurrentTime(event.currentTarget.currentTime)}
-        onEnded={() => setIsPlaying(false)}
-        sx={{ width: "100%", maxHeight: 520, bgcolor: "black" }}
-      />
-      <Stack direction="row" spacing={2} sx={{ alignItems: "center" }}>
-        <IconButton aria-label={isPlaying ? "Pause preview" : "Play preview"} onClick={() => void togglePlayback()}>
-          {isPlaying ? <PauseIcon /> : <PlayArrowIcon />}
-        </IconButton>
-        <Slider
-          aria-label="Preview position"
-          min={0}
-          max={duration || 0}
-          value={Math.min(currentTime, duration || 0)}
-          onChange={(_, value) => seekTo(Array.isArray(value) ? value[0] : value)}
-          disabled={!duration}
-        />
-        <Typography sx={{ minWidth: 88 }} color="text.secondary">
-          {formatDuration(currentTime)}
-        </Typography>
-      </Stack>
-    </Stack>
-  );
-}
-
-function formatDuration(seconds: number | null | undefined) {
-  if (!seconds) {
-    return "Unknown";
-  }
-
-  const minutes = Math.floor(seconds / 60);
-  const rest = Math.round(seconds % 60)
-    .toString()
-    .padStart(2, "0");
-
-  return `${minutes}:${rest}`;
 }

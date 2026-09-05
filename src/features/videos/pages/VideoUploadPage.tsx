@@ -55,14 +55,14 @@ export function VideoUploadPage() {
         Upload video
       </Typography>
       <Typography color="text.secondary">
-        Upload a video for visual-only processing. Audio is ignored by the backend.
+        Your original video is stored without compression or quality changes. Play it after upload and start analyzing when you are ready.
       </Typography>
 
       {error && <Alert severity="error">{error}</Alert>}
 
-      <Button variant="outlined" component="label" startIcon={<UploadIcon />}>
+      <Button variant="outlined" component="label" disabled={isUploading} startIcon={<UploadIcon />}>
         Choose file
-        <input hidden type="file" accept="video/*" onChange={handleFileChange} />
+        <input hidden type="file" accept="video/*" disabled={isUploading} onChange={handleFileChange} />
       </Button>
 
       {file && <Typography>{file.name}</Typography>}

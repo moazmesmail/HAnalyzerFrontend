@@ -47,7 +47,7 @@ export function VideosPage() {
       {!videos.isLoading && items.length === 0 && <Alert severity="info">No videos uploaded yet.</Alert>}
 
       {items.length > 0 && (
-        <Paper>
+        <Paper sx={{ overflowX: "auto" }}>
           <Table>
             <TableHead>
               <TableRow>
@@ -65,11 +65,11 @@ export function VideosPage() {
                   <TableCell>{new Date(video.created_at).toLocaleString()}</TableCell>
                   <TableCell>{formatDuration(video.duration_seconds)}</TableCell>
                   <TableCell>
-                    <Chip size="small" label={video.preparation_status} />
+                    <Chip size="small" label={video.preparation_status === "uploaded" ? "Uploaded" : video.preparation_status === "ready" ? "Visual input prepared" : video.preparation_status === "preparing" ? "Preparing video" : "Preparation failed"} />
                   </TableCell>
                   <TableCell align="right">
                     <Button component={RouterLink} to={`/app/videos/${video.id}`}>
-                      Open
+                      Play / Analyze
                     </Button>
                   </TableCell>
                 </TableRow>

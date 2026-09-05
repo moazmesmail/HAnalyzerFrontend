@@ -26,3 +26,14 @@ export function uploadVideo(file: File, csrfToken: string | null, onProgress: (p
 export function previewUrl(video: Video) {
   return video.preview_asset_id ? mediaUrl(video.preview_asset_id) : null;
 }
+
+export function originalUrl(video: Video) {
+  return video.original_asset_id ? mediaUrl(video.original_asset_id) : null;
+}
+
+export function startVideoAnalysis(videoId: string, csrfToken: string | null) {
+  return apiRequest<Video>(`/videos/${videoId}/analyze`, {
+    method: "POST",
+    csrfToken
+  });
+}

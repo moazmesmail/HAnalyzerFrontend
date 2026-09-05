@@ -32,5 +32,6 @@ export type Video = {
   preparation_status: "uploaded" | "preparing" | "ready" | "failed";
   preparation_error?: string | null;
   preparation_retryable?: boolean;
+  original_asset_id?: string | null;
   preview_asset_id?: string | null;
 };
