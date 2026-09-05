@@ -6,6 +6,7 @@ import { AdminRegistrationsPage } from "../features/approvals/pages/AdminRegistr
 import { VideoDetailPage } from "../features/videos/pages/VideoDetailPage";
 import { VideoUploadPage } from "../features/videos/pages/VideoUploadPage";
 import { VideosPage } from "../features/videos/pages/VideosPage";
+import { AnalysisPage } from "../features/analysis/pages/AnalysisPage";
 import { PublicLayout } from "./layouts/PublicLayout";
 import { WorkspaceLayout } from "./layouts/WorkspaceLayout";
 import { AdminRoute, ApprovedRoute, PublicOnlyRoute } from "./router";
@@ -46,6 +47,7 @@ export function App() {
         <Route path="videos" element={<VideosPage />} />
         <Route path="videos/new" element={<VideoUploadPage />} />
         <Route path="videos/:videoId" element={<VideoDetailPage />} />
+        <Route path="analyses/:sessionId" element={<AnalysisPage />} />
         <Route
           path="admin/registrations"
           element={

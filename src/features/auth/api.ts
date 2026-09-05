@@ -2,7 +2,7 @@ import { apiRequest } from "../../shared/api/client";
 import type { AuthResponse } from "../../shared/api/generated";
 
 export type Credentials = {
-  email: string;
+  identity: string;
   password: string;
 };
 

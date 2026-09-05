@@ -1,9 +1,9 @@
 export type AuthFormValues = {
-  email: string;
+  identity: string;
   password: string;
 };
 
 export const defaultAuthValues: AuthFormValues = {
-  email: "",
+  identity: "",
   password: ""
 };

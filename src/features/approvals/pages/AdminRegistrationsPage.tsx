@@ -72,7 +72,7 @@ export function AdminRegistrationsPage() {
           <Table size="small">
             <TableHead>
               <TableRow>
-                <TableCell>Email</TableCell>
+                <TableCell>Identity</TableCell>
                 <TableCell>Registered</TableCell>
                 <TableCell>Status</TableCell>
                 <TableCell align="right">Actions</TableCell>
@@ -81,13 +81,13 @@ export function AdminRegistrationsPage() {
             <TableBody>
               {items.map((registration) => (
                 <TableRow key={registration.id}>
-                  <TableCell>{registration.email}</TableCell>
+                  <TableCell>{registration.identity}</TableCell>
                   <TableCell>{new Date(registration.created_at).toLocaleString()}</TableCell>
                   <TableCell>{registration.status}</TableCell>
                   <TableCell align="right">
                     <Tooltip title="Approve">
                       <IconButton
-                        aria-label={`Approve ${registration.email}`}
+                        aria-label={`Approve ${registration.identity}`}
                         onClick={() => setPendingDecision({ registration, decision: "approved" })}
                       >
                         <CheckIcon />
@@ -95,7 +95,7 @@ export function AdminRegistrationsPage() {
                     </Tooltip>
                     <Tooltip title="Reject">
                       <IconButton
-                        aria-label={`Reject ${registration.email}`}
+                        aria-label={`Reject ${registration.identity}`}
                         onClick={() => setPendingDecision({ registration, decision: "rejected" })}
                       >
                         <CloseIcon />
@@ -114,7 +114,7 @@ export function AdminRegistrationsPage() {
         <DialogContent>
           <Typography>
             {pendingDecision?.decision === "approved" ? "Approve" : "Reject"}{" "}
-            {pendingDecision?.registration.email}?
+            {pendingDecision?.registration.identity}?
           </Typography>
         </DialogContent>
         <DialogActions>

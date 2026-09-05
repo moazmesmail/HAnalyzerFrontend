@@ -30,10 +30,3 @@ export function previewUrl(video: Video) {
 export function originalUrl(video: Video) {
   return video.original_asset_id ? mediaUrl(video.original_asset_id) : null;
 }
-
-export function startVideoAnalysis(videoId: string, csrfToken: string | null) {
-  return apiRequest<Video>(`/videos/${videoId}/analyze`, {
-    method: "POST",
-    csrfToken
-  });
-}

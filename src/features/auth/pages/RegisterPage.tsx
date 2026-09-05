@@ -28,11 +28,16 @@ export function RegisterPage() {
       <Typography color="text.secondary">Create an account. The owner must approve it before login.</Typography>
       {error && <Alert severity="error">{error}</Alert>}
       <TextField
-        label="Email"
-        type="email"
-        autoComplete="email"
+        label="Identity"
+        autoComplete="username"
         required
-        {...form.register("email", { required: true })}
+        error={Boolean(form.formState.errors.identity)}
+        helperText={form.formState.errors.identity?.message || "Use at least 4 characters."}
+        {...form.register("identity", {
+          required: "Identity is required.",
+          validate: (value) => value.trim().length > 3 || "Identity must contain more than 3 characters.",
+          maxLength: { value: 64, message: "Identity cannot exceed 64 characters." }
+        })}
       />
       <TextField
         label="Password"

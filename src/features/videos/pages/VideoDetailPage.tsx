@@ -1,34 +1,53 @@
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
-import { Alert, Box, Button, Chip, CircularProgress, Paper, Stack, Typography } from "@mui/material";
+import { Alert, Box, Button, Chip, CircularProgress, FormControl, InputLabel, MenuItem, Paper, Select, Stack, Typography } from "@mui/material";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { Link as RouterLink, useParams } from "react-router-dom";
+import { Link as RouterLink, useNavigate, useParams } from "react-router-dom";
 import { getErrorMessage } from "../../../shared/api/errors";
 import { useSession } from "../../auth/session";
-import { getVideo, originalUrl, startVideoAnalysis } from "../api";
+import { getVideo, originalUrl } from "../api";
 import { videoKeys } from "../queries";
+import { listAnalysisProfiles, listVideoAnalyses, startAnalysis } from "../../analysis/api";
+import { analysisKeys } from "../../analysis/queries";
 
 export function VideoDetailPage() {
   const { videoId } = useParams();
   const session = useSession();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [playbackError, setPlaybackError] = useState(false);
+  const [samplingFps, setSamplingFps] = useState(3);
+  const [profileId, setProfileId] = useState("equestrian_show_jumping");
   const video = useQuery({
     queryKey: videoKeys.detail(session.user?.id, videoId),
     queryFn: () => getVideo(videoId ?? ""),
     enabled: Boolean(videoId),
     refetchInterval: (query) => query.state.data?.preparation_status === "preparing" ? 2000 : false
   });
+  const analyses = useQuery({
+    queryKey: analysisKeys.video(session.user?.id, videoId),
+    queryFn: () => listVideoAnalyses(videoId ?? ""),
+    enabled: Boolean(videoId),
+    refetchInterval: (query) =>
+      query.state.data?.some((item) => ["pending", "running"].includes(item.status)) ? 2000 : false
+  });
+  const profiles = useQuery({
+    queryKey: analysisKeys.profiles(),
+    queryFn: listAnalysisProfiles
+  });
   const analyze = useMutation({
-    mutationFn: () => startVideoAnalysis(videoId ?? "", session.csrfToken),
+    mutationFn: () => startAnalysis(videoId ?? "", session.csrfToken, profileId, samplingFps),
     onSuccess: async (updated) => {
-      queryClient.setQueryData(videoKeys.detail(session.user?.id, videoId), updated);
-      await queryClient.invalidateQueries({ queryKey: videoKeys.list(session.user?.id) });
+      await queryClient.invalidateQueries({
+        queryKey: analysisKeys.video(session.user?.id, videoId)
+      });
+      navigate(`/app/analyses/${updated.id}`);
     }
   });
   const currentVideo = video.data;
   const src = currentVideo ? originalUrl(currentVideo) : null;
-  const processing = currentVideo?.preparation_status === "preparing" || analyze.isPending;
+  const processing = analyze.isPending;
+  const exceedsDurationLimit = (currentVideo?.duration_seconds ?? 0) >= 120;
 
   return (
     <Stack spacing={3}>
@@ -53,14 +72,33 @@ export function VideoDetailPage() {
         <Paper sx={{ p: 2 }}>
           <Stack spacing={2}>
             <Typography variant="h6">Analysis</Typography>
-            <Chip sx={{ alignSelf: "flex-start" }} label={processing ? "Preparing video" : currentVideo.preparation_status === "ready" ? "Visual input prepared" : currentVideo.preparation_status === "failed" ? "Preparation failed" : "Not started"} />
-            <Typography color="text.secondary">Start analyzing prepares a silent visual copy for analysis. Competition analysis results are not available yet.</Typography>
-            {currentVideo.preparation_error && <Alert severity="error">{currentVideo.preparation_error}</Alert>}
+            <Typography color="text.secondary">Analyze timestamped evidence at a minimum of 3 frames per second so brief competition actions are represented.</Typography>
+            {exceedsDurationLimit && <Alert severity="warning">This previously uploaded video is 2 minutes or longer and cannot be analyzed. Upload a shorter clip.</Alert>}
+            <FormControl size="small" sx={{ maxWidth: 360 }}>
+              <InputLabel id="analysis-profile-label">Analysis profile</InputLabel>
+              <Select labelId="analysis-profile-label" label="Analysis profile" value={profileId} onChange={(event) => setProfileId(event.target.value)}>
+                {(profiles.data ?? []).map((profile) => <MenuItem key={profile.id} value={profile.id}>{profile.display_name}</MenuItem>)}
+              </Select>
+            </FormControl>
+            <FormControl size="small" sx={{ maxWidth: 260 }}>
+              <InputLabel id="sampling-fps-label">Sampling rate</InputLabel>
+              <Select labelId="sampling-fps-label" label="Sampling rate" value={samplingFps} onChange={(event) => setSamplingFps(Number(event.target.value))}>
+                <MenuItem value={3}>3 FPS</MenuItem>
+                <MenuItem value={5}>5 FPS</MenuItem>
+                <MenuItem value={10}>10 FPS</MenuItem>
+              </Select>
+            </FormControl>
             {analyze.isError && <Alert severity="error">{getErrorMessage(analyze.error)}</Alert>}
             <Button variant="contained" startIcon={processing ? <CircularProgress size={18} color="inherit" /> : <PlayArrowIcon />}
-              disabled={!src || processing || currentVideo.preparation_status === "ready"} onClick={() => analyze.mutate()} sx={{ alignSelf: "flex-start" }}>
-              {processing ? "Preparing…" : currentVideo.preparation_status === "ready" ? "Visual input prepared" : currentVideo.preparation_status === "failed" ? "Retry analyzing" : "Start analyzing"}
+              disabled={!src || processing || exceedsDurationLimit} onClick={() => analyze.mutate()} sx={{ alignSelf: "flex-start" }}>
+              {processing ? "Starting…" : "Start analyzing"}
             </Button>
+            {analyses.data && analyses.data.length > 0 && <Stack spacing={1}>
+              <Typography variant="subtitle1">Previous analyses</Typography>
+              {analyses.data.map((item) => <Button key={item.id} component={RouterLink} to={`/app/analyses/${item.id}`} variant="outlined" sx={{ justifyContent: "space-between" }}>
+                <span>{new Date(item.created_at).toLocaleString()} · {item.terminal_progress_percent}%</span><Chip size="small" label={item.status} />
+              </Button>)}
+            </Stack>}
           </Stack>
         </Paper>
       </>}

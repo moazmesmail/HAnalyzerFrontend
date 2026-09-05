@@ -34,11 +34,16 @@ export function LoginPage() {
       <Typography color="text.secondary">Login with an approved account.</Typography>
       {error && <Alert severity="error">{error}</Alert>}
       <TextField
-        label="Email"
-        type="email"
-        autoComplete="email"
+        label="Identity"
+        autoComplete="username"
         required
-        {...form.register("email", { required: true })}
+        error={Boolean(form.formState.errors.identity)}
+        helperText={form.formState.errors.identity?.message}
+        {...form.register("identity", {
+          required: "Identity is required.",
+          minLength: { value: 4, message: "Identity must contain more than 3 characters." },
+          maxLength: { value: 64, message: "Identity cannot exceed 64 characters." }
+        })}
       />
       <TextField
         label="Password"
