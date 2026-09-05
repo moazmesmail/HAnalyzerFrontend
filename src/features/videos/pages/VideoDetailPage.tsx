@@ -86,6 +86,7 @@ export function VideoDetailPage() {
                 <MenuItem value={3}>3 FPS</MenuItem>
                 <MenuItem value={5}>5 FPS</MenuItem>
                 <MenuItem value={10}>10 FPS</MenuItem>
+                <MenuItem value={15}>15 FPS</MenuItem>
               </Select>
             </FormControl>
             {analyze.isError && <Alert severity="error">{getErrorMessage(analyze.error)}</Alert>}
