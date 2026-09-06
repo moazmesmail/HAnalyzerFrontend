@@ -59,7 +59,7 @@ export function LoginPage() {
       <Button type="submit" variant="contained" disabled={form.formState.isSubmitting}>
         Sign in
       </Button>
-      <Typography className="hp-auth-switch">New to Horse Park? <RouterLink to="/register">Create an account</RouterLink></Typography>
+      <Typography className="hp-auth-switch">New to Equestrian Centre? <RouterLink to="/register">Create an account</RouterLink></Typography>
     </Stack>
   );
 }

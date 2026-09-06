@@ -1,4 +1,4 @@
-import { AdminPanelSettingsRounded, AssessmentRounded, DashboardRounded, LogoutRounded, MenuRounded, NotificationsNoneRounded, PetsRounded, UploadRounded, VideoLibraryRounded } from "@mui/icons-material";
+import { AdminPanelSettingsRounded, AssessmentRounded, DashboardRounded, LogoutRounded, MenuRounded, NotificationsNoneRounded, UploadRounded, VideoLibraryRounded } from "@mui/icons-material";
 import { Avatar, Badge, IconButton } from "@mui/material";
 import { useMemo, useState } from "react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
@@ -24,13 +24,13 @@ export function WorkspaceLayout() {
     <div className="hp-dashboard">
       {menuOpen && <button className="hp-backdrop" aria-label="Close menu" onClick={() => setMenuOpen(false)} />}
       <aside className={menuOpen ? "hp-sidebar open" : "hp-sidebar"}>
-        <NavLink className="hp-brand" to="/app/dashboard" onClick={() => setMenuOpen(false)}><PetsRounded /><div><b>HORSE PARK</b><span>AL AMMARIYAH</span></div></NavLink>
+        <NavLink className="hp-brand" to="/app/dashboard" onClick={() => setMenuOpen(false)}><img src="/logo.jpeg" alt="Equestrian Centre logo" /><div><b>EQUESTRIAN CENTRE</b><span>AL AMMARIYAH</span></div></NavLink>
         <small className="hp-label">MAIN</small>
         <nav>
           {riderLinks.map(item => <NavLink key={item.to} to={item.to} end className={() => isLinkActive(item.to, location.pathname) ? "active" : undefined} onClick={() => setMenuOpen(false)}>{item.icon}<span>{item.label}</span></NavLink>)}
           {session.user?.role === "admin" && <NavLink to="/app/admin/registrations" className={({ isActive }) => isActive ? "active" : undefined} onClick={() => setMenuOpen(false)}><AdminPanelSettingsRounded /><span>Approvals</span></NavLink>}
         </nav>
-        <small className="hp-label">HORSE PARK</small>
+        <small className="hp-label">EQUESTRIAN CENTRE</small>
         <nav className="hp-demo-nav">{demoLinks.map(item => <button key={item}><span>◇</span>{item}</button>)}</nav>
         <div className="hp-sidebar-bottom">
           <button className="hp-logout" onClick={() => void session.logout()}><LogoutRounded /><span>Logout</span></button>
@@ -39,7 +39,7 @@ export function WorkspaceLayout() {
       <main className="hp-main">
         <header className="hp-header">
           <IconButton className="hp-menu" onClick={() => setMenuOpen(!menuOpen)} aria-label="Open navigation"><MenuRounded /></IconButton>
-          <div><h1>{location.pathname === "/app/dashboard" ? `Welcome, ${firstName}` : pageTitle(location.pathname)} <span>{role}</span></h1><p>Horse Park Rider Dashboard</p></div>
+          <div><h1>{location.pathname === "/app/dashboard" ? `Welcome, ${firstName}` : pageTitle(location.pathname)} <span>{role}</span></h1><p>Equestrian Centre Rider Dashboard</p></div>
           <div className="hp-header-actions"><span>☀️ 32°C <small>Al Ammariyah</small></span><Badge badgeContent={3} color="error"><NotificationsNoneRounded /></Badge><Avatar>{firstName[0]?.toUpperCase()}</Avatar><div><b>{firstName}</b><small>{role}</small></div></div>
         </header>
         <div className="hp-route-content"><Outlet /></div>
@@ -55,7 +55,7 @@ function pageTitle(pathname: string) {
   if (pathname.startsWith("/app/videos")) return "Videos & highlights";
   if (pathname.startsWith("/app/admin")) return "Registration approvals";
   if (pathname.startsWith("/app/analyses")) return "Performance analysis";
-  return "Horse Park";
+  return "Equestrian Centre";
 }
 
 function isLinkActive(target: string, pathname: string) {

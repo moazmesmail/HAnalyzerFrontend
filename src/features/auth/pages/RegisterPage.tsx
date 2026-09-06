@@ -53,7 +53,7 @@ export function RegisterPage() {
       <Button type="submit" variant="contained" disabled={form.formState.isSubmitting}>
         Create account
       </Button>
-      <Typography className="hp-auth-note">Accounts are reviewed by the Horse Park team before access is granted.</Typography>
+      <Typography className="hp-auth-note">Accounts are reviewed by the Equestrian Centre team before access is granted.</Typography>
       <Typography className="hp-auth-switch">Already have an account? <RouterLink to="/login">Sign in</RouterLink></Typography>
     </Stack>
   );
