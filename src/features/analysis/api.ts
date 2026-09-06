@@ -1,5 +1,5 @@
 import { apiRequest, mediaUrl } from "../../shared/api/client";
-import type { AnalysisProfile, AnalysisReport, AnalysisResults, AnalysisSession, ModelUsage } from "../../shared/api/generated";
+import type { AnalysisProfile, AnalysisReport, AnalysisResults, AnalysisSession, ModelUsage, StructuredAnalysis } from "../../shared/api/generated";
 
 export function listAnalysisProfiles() {
   return apiRequest<AnalysisProfile[]>("/analysis-profiles");
@@ -31,6 +31,10 @@ export function getAnalysisUsage(sessionId: string) {
 
 export function getAnalysisReport(sessionId: string) {
   return apiRequest<AnalysisReport>(`/analyses/${sessionId}/report`);
+}
+
+export function getStructuredAnalysis(sessionId: string) {
+  return apiRequest<StructuredAnalysis>(`/analyses/${sessionId}/structured`);
 }
 
 export function retryAnalysis(sessionId: string, csrfToken: string | null) {

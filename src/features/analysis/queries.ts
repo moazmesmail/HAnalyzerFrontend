@@ -6,6 +6,10 @@ export const analysisKeys = {
     [...analysisKeys.all, userId, "results", sessionId] as const,
   usage: (userId: string | undefined, sessionId: string | undefined) =>
     [...analysisKeys.all, userId, "usage", sessionId] as const,
+  structured: (userId: string | undefined, sessionId: string | undefined) =>
+    [...analysisKeys.all, userId, "structured", sessionId] as const,
+  report: (userId: string | undefined, sessionId: string | undefined) =>
+    [...analysisKeys.all, userId, "report", sessionId] as const,
   profiles: () => [...analysisKeys.all, "profiles"] as const,
   video: (userId: string | undefined, videoId: string | undefined) =>
     [...analysisKeys.all, userId, "video", videoId] as const

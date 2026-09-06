@@ -118,7 +118,70 @@ export type AnalysisReport = {
   status: string;
   profile_id: string;
   model: string;
-  summary: AnalysisSession["summary"];
-  findings: AnalysisObservation[];
+  report_status: string;
+  report_version: string;
+  content: DeepReportContent;
   limitations: string[];
+};
+
+export type AnalysisBatchJob = {
+  id: string;
+  batch_number: number;
+  start_seconds: number;
+  end_seconds: number;
+  source_frame_count: number;
+  status: string;
+  attempt_count: number;
+  error_code?: string | null;
+  error_message?: string | null;
+};
+
+export type AnalysisArtifact = {
+  id: string;
+  batch_job_id?: string | null;
+  category: string;
+  subtype: string;
+  title: string;
+  start_seconds: number;
+  end_seconds: number;
+  observation: string;
+  interpretation?: string | null;
+  attributes: Record<string, unknown>;
+  confidence: number;
+  importance: number;
+  evidence_frame_ids: string[];
+  limitations: string[];
+};
+
+export type AnalysisCoverage = {
+  percent?: number;
+  successful_batches?: number;
+  total_batches?: number;
+  covered_ranges?: Array<{ start_seconds: number; end_seconds: number }>;
+  missing_ranges?: Array<{ start_seconds: number; end_seconds: number }>;
+};
+
+export type StructuredAnalysis = {
+  batch_jobs: AnalysisBatchJob[];
+  artifacts: AnalysisArtifact[];
+  coverage: AnalysisCoverage;
+};
+
+export type DeepReportContent = {
+  executive_summary?: string;
+  video_features?: Record<string, unknown>;
+  competition_context?: Record<string, unknown>;
+  key_moments?: Array<Record<string, unknown>>;
+  run_summaries?: Array<Record<string, unknown>>;
+  course_analysis?: Record<string, unknown>;
+  technique_analysis?: Record<string, unknown>;
+  synchronization_analysis?: Record<string, unknown>;
+  scoreboard_results?: Array<Record<string, unknown>>;
+  comparisons?: Array<Record<string, unknown>>;
+  causal_hypotheses?: Array<Record<string, unknown>>;
+  strengths?: string[];
+  weaknesses?: string[];
+  recommendations?: string[];
+  limitations?: string[];
+  coverage?: AnalysisCoverage;
 };
