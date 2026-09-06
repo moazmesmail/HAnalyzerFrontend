@@ -7,7 +7,7 @@ import { VideoDetailPage } from "../features/videos/pages/VideoDetailPage";
 import { VideoUploadPage } from "../features/videos/pages/VideoUploadPage";
 import { VideosPage } from "../features/videos/pages/VideosPage";
 import { AnalysisPage } from "../features/analysis/pages/AnalysisPage";
-import { DashboardPage } from "../features/dashboard";
+import { AnalysisDashboardPage, RiderDashboardPage } from "../features/dashboard";
 import { PublicLayout } from "./layouts/PublicLayout";
 import { WorkspaceLayout } from "./layouts/WorkspaceLayout";
 import { AdminRoute, ApprovedRoute, PublicOnlyRoute } from "./router";
@@ -45,7 +45,8 @@ export function App() {
         }
       >
         <Route index element={<Navigate to="/app/dashboard" replace />} />
-        <Route path="dashboard" element={<DashboardPage />} />
+        <Route path="dashboard" element={<RiderDashboardPage />} />
+        <Route path="analysis-dashboard" element={<AnalysisDashboardPage />} />
         <Route path="videos" element={<VideosPage />} />
         <Route path="videos/new" element={<VideoUploadPage />} />
         <Route path="videos/:videoId" element={<VideoDetailPage />} />

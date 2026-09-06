@@ -1,1 +1,2 @@
-export { DashboardPage } from "./pages/DashboardPage";
+export { AnalysisDashboardPage } from "./pages/DashboardPage";
+export { RiderDashboardPage } from "./pages/RiderDashboardPage";

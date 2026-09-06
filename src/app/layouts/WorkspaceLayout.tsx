@@ -1,4 +1,4 @@
-import { AdminPanelSettingsRounded, DashboardRounded, LogoutRounded, MenuRounded, NotificationsNoneRounded, PetsRounded, UploadRounded, VideoLibraryRounded } from "@mui/icons-material";
+import { AdminPanelSettingsRounded, AssessmentRounded, DashboardRounded, LogoutRounded, MenuRounded, NotificationsNoneRounded, PetsRounded, UploadRounded, VideoLibraryRounded } from "@mui/icons-material";
 import { Avatar, Badge, IconButton } from "@mui/material";
 import { useMemo, useState } from "react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
@@ -7,6 +7,7 @@ import "../../features/dashboard/pages/dashboard.css";
 
 const riderLinks = [
   { label: "Dashboard", to: "/app/dashboard", icon: <DashboardRounded /> },
+  { label: "Analysis dashboard", to: "/app/analysis-dashboard", icon: <AssessmentRounded /> },
   { label: "Videos & highlights", to: "/app/videos", icon: <VideoLibraryRounded /> },
   { label: "Upload video", to: "/app/videos/new", icon: <UploadRounded /> },
 ];
@@ -49,6 +50,7 @@ export function WorkspaceLayout() {
 }
 
 function pageTitle(pathname: string) {
+  if (pathname === "/app/analysis-dashboard") return "Analysis dashboard";
   if (pathname === "/app/videos/new") return "Upload video";
   if (pathname.startsWith("/app/videos/")) return "Video analysis";
   if (pathname.startsWith("/app/videos")) return "Videos & highlights";

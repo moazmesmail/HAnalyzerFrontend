@@ -24,4 +24,41 @@
   .hp-route-content>.MuiStack-root{padding:14px}
   .hp-backdrop{background:#020a10aa;border:0;display:block;inset:0;position:fixed;z-index:9}
 }
+
+/* Analysis-first dashboard */
+.hp-analysis-dashboard{max-width:1540px;margin:0 auto}
+.hp-analysis-stats .hp-stat:nth-child(1) .hp-stat-icon{background:#173f61;color:#79bdf2}
+.hp-analysis-stats .hp-stat:nth-child(2) .hp-stat-icon{background:#255d44;color:#a9e9bf}
+.hp-analysis-stats .hp-stat:nth-child(3) .hp-stat-icon{background:#59427a;color:#dfc8ff}
+.hp-analysis-stats .hp-stat:nth-child(4) .hp-stat-icon{background:#76532e;color:#f6cc8c}
+.hp-analysis-focus{display:grid;gap:12px;grid-template-columns:minmax(0,1.65fr) minmax(330px,.85fr)}
+.hp-featured-analysis{padding:16px}
+.hp-featured-video{align-items:center;aspect-ratio:16/7;background:#020a10;border:0;border-radius:7px;color:#fff;cursor:pointer;display:flex;font-size:54px;justify-content:center;overflow:hidden;padding:0;position:relative;width:100%}
+.hp-featured-video video{height:100%;object-fit:cover;width:100%}
+.hp-featured-video i{align-items:center;background:#061521cc;border:1px solid #ffffffaa;border-radius:50%;display:flex;height:52px;justify-content:center;position:absolute;width:52px}
+.hp-featured-video i svg{font-size:32px}
+.hp-featured-video:disabled{cursor:default}
+.hp-analysis-progress{color:var(--muted);display:flex;font-size:11px;justify-content:space-between;margin:13px 0 7px;text-transform:capitalize}
+.hp-analysis-progress b{color:#edf3f6}
+.hp-featured-analysis>.MuiLinearProgress-root{background:#173142;height:5px}
+.hp-featured-analysis>.MuiLinearProgress-root .MuiLinearProgress-bar{background:#3da77a}
+.hp-analysis-actions{display:flex;gap:9px;margin-top:14px}
+.hp-recent-analysis{padding:16px}
+.hp-video-row{align-items:center;border-bottom:1px solid var(--line);display:grid;gap:10px;grid-template-columns:82px minmax(0,1fr) auto;padding:10px 0}
+.hp-video-row:hover,.hp-result-row:hover{background:#102b3c}
+.hp-video-row-thumb{align-items:center;background:#142c3b;border-radius:5px;display:flex;height:50px;justify-content:center;overflow:hidden;position:relative}
+.hp-video-row-thumb video{height:100%;object-fit:cover;width:100%}
+.hp-video-row-thumb svg{background:#061521bb;border-radius:50%;font-size:22px;position:absolute}
+.hp-video-row b,.hp-video-row small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hp-video-row b{font-size:11px}.hp-video-row small{color:var(--muted);font-size:9px;margin-top:5px}
+.hp-video-row em{color:#d2a15c;font-size:9px;font-style:normal}
+.hp-analysis-results{display:grid;gap:12px;grid-template-columns:1.65fr .85fr;margin-top:12px}
+.hp-result-row{align-items:center;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;padding:11px 4px}
+.hp-result-row b,.hp-result-row small{display:block;font-size:10px}.hp-result-row small{color:var(--muted);margin-top:4px}
+.hp-analysis-help p,.hp-muted,.hp-empty-analysis p{color:var(--muted);font-size:11px;line-height:1.7}
+.hp-analysis-help .MuiButton-root{margin-top:10px}
+.hp-empty-analysis{padding:22px;text-align:center}
+
+@media(max-width:1050px){.hp-analysis-focus,.hp-analysis-results{grid-template-columns:1fr}.hp-analysis-stats{grid-template-columns:1fr 1fr}}
+@media(max-width:750px){.hp-analysis-stats{grid-template-columns:1fr}.hp-featured-video{aspect-ratio:16/9}.hp-video-row{grid-template-columns:70px minmax(0,1fr)}.hp-video-row em{display:none}.hp-analysis-actions{align-items:stretch;flex-direction:column}}
 .hp-videos button:disabled{cursor:not-allowed;opacity:.5}.hp-videos button>span{overflow:hidden}.hp-videos button video{height:100%;object-fit:cover;width:100%}.hp-video-dialog{background:#091c29!important;border:1px solid #244052;color:#eef4f6!important}.hp-video-dialog-head{align-items:center;border-bottom:1px solid #183446;display:flex;justify-content:space-between;padding:12px 16px}.hp-video-dialog-head b,.hp-video-dialog-head small{display:block}.hp-video-dialog-head small{color:#8fa2ae;font-size:11px;margin-top:3px}.hp-video-dialog-head svg{color:white}.hp-video-dialog .MuiDialogContent-root{background:#03090d;padding:0}.hp-video-dialog video{display:block;max-height:70vh;width:100%}.hp-video-switch{display:flex;gap:8px;padding:12px 16px}.hp-video-switch button{background:#102b3c;border:1px solid #28475a;border-radius:4px;color:#b7c4cb;cursor:pointer;padding:7px 18px}.hp-video-switch button.active{background:#bf8b43;border-color:#bf8b43;color:white}.hp-video-switch button:disabled{cursor:not-allowed;opacity:.4}
