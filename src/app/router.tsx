@@ -55,7 +55,7 @@ export function PublicOnlyRoute({ children }: PropsWithChildren) {
   }
 
   if (session.user) {
-    return <Navigate to="/app/videos" replace />;
+    return <Navigate to="/app/dashboard" replace />;
   }
 
   return children;

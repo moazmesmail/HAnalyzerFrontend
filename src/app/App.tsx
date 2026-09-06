@@ -44,7 +44,7 @@ export function App() {
           </ApprovedRoute>
         }
       >
-        <Route index element={<Navigate to="/app/videos" replace />} />
+        <Route index element={<Navigate to="/app/dashboard" replace />} />
         <Route path="dashboard" element={<DashboardPage />} />
         <Route path="videos" element={<VideosPage />} />
         <Route path="videos/new" element={<VideoUploadPage />} />

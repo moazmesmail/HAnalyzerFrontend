@@ -23,7 +23,7 @@ export function LoginPage() {
 
     try {
       await session.login(values);
-      navigate(state?.from || "/app/videos", { replace: true });
+      navigate(state?.from || "/app/dashboard", { replace: true });
     } catch (caught) {
       setError(getErrorMessage(caught));
     }
