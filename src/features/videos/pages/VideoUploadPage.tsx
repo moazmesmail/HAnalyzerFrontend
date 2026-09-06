@@ -35,11 +35,6 @@ export function VideoUploadPage() {
     setIsInspecting(true);
     try {
       const selectedDuration = await readVideoDuration(selectedFile);
-      if (selectedDuration >= 120) {
-        setError("Video duration must be under 2 minutes.");
-        event.target.value = "";
-        return;
-      }
       setFile(selectedFile);
       setDuration(selectedDuration);
     } catch {
@@ -80,7 +75,7 @@ export function VideoUploadPage() {
         Upload video
       </Typography>
       <Typography color="text.secondary">
-        Videos must be under 2 minutes. Your original file is stored without compression or quality changes.
+        Your original file is stored without compression or quality changes.
       </Typography>
 
       {error && <Alert severity="error">{error}</Alert>}

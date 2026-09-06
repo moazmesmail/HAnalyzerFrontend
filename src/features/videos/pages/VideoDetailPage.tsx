@@ -47,7 +47,6 @@ export function VideoDetailPage() {
   const currentVideo = video.data;
   const src = currentVideo ? originalUrl(currentVideo) : null;
   const processing = analyze.isPending;
-  const exceedsDurationLimit = (currentVideo?.duration_seconds ?? 0) >= 120;
 
   return (
     <Stack spacing={3}>
@@ -73,7 +72,6 @@ export function VideoDetailPage() {
           <Stack spacing={2}>
             <Typography variant="h6">Analysis</Typography>
             <Typography color="text.secondary">Analyze timestamped evidence at a minimum of 3 frames per second so brief competition actions are represented.</Typography>
-            {exceedsDurationLimit && <Alert severity="warning">This previously uploaded video is 2 minutes or longer and cannot be analyzed. Upload a shorter clip.</Alert>}
             <FormControl size="small" sx={{ maxWidth: 360 }}>
               <InputLabel id="analysis-profile-label">Analysis profile</InputLabel>
               <Select labelId="analysis-profile-label" label="Analysis profile" value={profileId} onChange={(event) => setProfileId(event.target.value)}>
@@ -91,7 +89,7 @@ export function VideoDetailPage() {
             </FormControl>
             {analyze.isError && <Alert severity="error">{getErrorMessage(analyze.error)}</Alert>}
             <Button variant="contained" startIcon={processing ? <CircularProgress size={18} color="inherit" /> : <PlayArrowIcon />}
-              disabled={!src || processing || exceedsDurationLimit} onClick={() => analyze.mutate()} sx={{ alignSelf: "flex-start" }}>
+              disabled={!src || processing} onClick={() => analyze.mutate()} sx={{ alignSelf: "flex-start" }}>
               {processing ? "Starting…" : "Start analyzing"}
             </Button>
             {analyses.data && analyses.data.length > 0 && <Stack spacing={1}>
