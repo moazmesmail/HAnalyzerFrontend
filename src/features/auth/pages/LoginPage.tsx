@@ -1,4 +1,5 @@
-import { Alert, Button, Stack, TextField, Typography } from "@mui/material";
+import { LockOutlined, PersonOutlineRounded } from "@mui/icons-material";
+import { Alert, Button, InputAdornment, Stack, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
@@ -30,13 +31,14 @@ export function LoginPage() {
   }
 
   return (
-    <Stack component="form" spacing={2} onSubmit={form.handleSubmit(onSubmit)}>
-      <Typography color="text.secondary">Login with an approved account.</Typography>
+    <Stack className="hp-auth-form" component="form" spacing={2} onSubmit={form.handleSubmit(onSubmit)}>
       {error && <Alert severity="error">{error}</Alert>}
       <TextField
-        label="Identity"
+        label="Username or email"
+        placeholder="Enter your username"
         autoComplete="username"
         required
+        slotProps={{ input: { startAdornment: <InputAdornment position="start"><PersonOutlineRounded /></InputAdornment> } }}
         error={Boolean(form.formState.errors.identity)}
         helperText={form.formState.errors.identity?.message}
         {...form.register("identity", {
@@ -48,16 +50,16 @@ export function LoginPage() {
       <TextField
         label="Password"
         type="password"
+        placeholder="Enter your password"
         autoComplete="current-password"
         required
+        slotProps={{ input: { startAdornment: <InputAdornment position="start"><LockOutlined /></InputAdornment> } }}
         {...form.register("password", { required: true })}
       />
       <Button type="submit" variant="contained" disabled={form.formState.isSubmitting}>
-        Login
+        Sign in
       </Button>
-      <Button component={RouterLink} to="/register">
-        Create account
-      </Button>
+      <Typography className="hp-auth-switch">New to Horse Park? <RouterLink to="/register">Create an account</RouterLink></Typography>
     </Stack>
   );
 }

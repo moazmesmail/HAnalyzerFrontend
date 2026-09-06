@@ -33,7 +33,6 @@ export function WorkspaceLayout() {
         <small className="hp-label">HORSE PARK</small>
         <nav className="hp-demo-nav">{demoLinks.map(item => <button key={item}><span>◇</span>{item}</button>)}</nav>
         <div className="hp-sidebar-bottom">
-          <div className="hp-arena"><b>Arena status</b><span><i /> Open</span><p>Main Arena <small>☀</small></p><p>Indoor Arena <small>☀</small></p></div>
           <button className="hp-logout" onClick={() => void session.logout()}><LogoutRounded /><span>Logout</span></button>
         </div>
       </aside>

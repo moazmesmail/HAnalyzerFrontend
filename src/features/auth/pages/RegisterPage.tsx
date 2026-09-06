@@ -1,4 +1,5 @@
-import { Alert, Button, Stack, TextField, Typography } from "@mui/material";
+import { LockOutlined, PersonOutlineRounded } from "@mui/icons-material";
+import { Alert, Button, InputAdornment, Stack, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
@@ -24,13 +25,14 @@ export function RegisterPage() {
   }
 
   return (
-    <Stack component="form" spacing={2} onSubmit={form.handleSubmit(onSubmit)}>
-      <Typography color="text.secondary">Create an account. The owner must approve it before login.</Typography>
+    <Stack className="hp-auth-form" component="form" spacing={2} onSubmit={form.handleSubmit(onSubmit)}>
       {error && <Alert severity="error">{error}</Alert>}
       <TextField
-        label="Identity"
+        label="Username or email"
+        placeholder="Choose your username"
         autoComplete="username"
         required
+        slotProps={{ input: { startAdornment: <InputAdornment position="start"><PersonOutlineRounded /></InputAdornment> } }}
         error={Boolean(form.formState.errors.identity)}
         helperText={form.formState.errors.identity?.message || "Use at least 4 characters."}
         {...form.register("identity", {
@@ -42,16 +44,17 @@ export function RegisterPage() {
       <TextField
         label="Password"
         type="password"
+        placeholder="At least 8 characters"
         autoComplete="new-password"
         required
+        slotProps={{ input: { startAdornment: <InputAdornment position="start"><LockOutlined /></InputAdornment> } }}
         {...form.register("password", { required: true, minLength: 8 })}
       />
       <Button type="submit" variant="contained" disabled={form.formState.isSubmitting}>
-        Register
+        Create account
       </Button>
-      <Button component={RouterLink} to="/login">
-        Back to login
-      </Button>
+      <Typography className="hp-auth-note">Accounts are reviewed by the Horse Park team before access is granted.</Typography>
+      <Typography className="hp-auth-switch">Already have an account? <RouterLink to="/login">Sign in</RouterLink></Typography>
     </Stack>
   );
 }
