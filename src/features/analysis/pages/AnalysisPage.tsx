@@ -105,6 +105,24 @@ export function AnalysisPage() {
         {retry.isError && <Alert severity="error">{getErrorMessage(retry.error)}</Alert>}
       </Stack>
     </Paper>}
+    {summaryVideo.data && <Paper sx={{ p: 2 }}><Stack spacing={2}>
+      <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
+        <Typography variant="h5">Summary video</Typography>
+        <Chip size="small" label={summaryVideo.data.status} color={summaryVideo.data.status === "completed" ? "success" : summaryVideo.data.status === "failed" ? "error" : "default"} />
+      </Stack>
+      {["pending", "processing"].includes(summaryVideo.data.status) && <Stack spacing={1}>
+        <LinearProgress />
+        <Typography color="text.secondary">Creating a silent highlight reel from {summaryVideo.data.selected_segments.length} selected segment{summaryVideo.data.selected_segments.length === 1 ? "" : "s"}…</Typography>
+      </Stack>}
+      {summaryVideo.data.status === "failed" && <Alert severity="error">{summaryVideo.data.error ?? "Summary video generation failed."}</Alert>}
+      {summaryVideo.data.status === "completed" && summaryVideo.data.asset_id && <>
+        <Box component="video" src={summaryVideoUrl(summaryVideo.data.asset_id)} controls playsInline preload="metadata" sx={{ width: "100%", maxHeight: 560, bgcolor: "black" }} />
+        <Stack direction={{ xs: "column", sm: "row" }} spacing={1} sx={{ alignItems: { sm: "center" } }}>
+          <Typography color="text.secondary" sx={{ flexGrow: 1 }}>{formatDuration(summaryVideo.data.duration_seconds ?? 0)} · silent · {summaryVideo.data.selected_segments.length} segment{summaryVideo.data.selected_segments.length === 1 ? "" : "s"}</Typography>
+          <Button component="a" href={summaryVideoUrl(summaryVideo.data.asset_id)} download startIcon={<DownloadIcon />}>Download</Button>
+        </Stack>
+      </>}
+    </Stack></Paper>}
     {structured.data && structured.data.batch_jobs.length > 0 && <Paper sx={{ p: 2 }}><Stack spacing={1}>
       <Typography variant="h5">Analysis coverage</Typography>
       <Typography>{structured.data.coverage.percent ?? 0}% of 10-second windows analyzed successfully</Typography>
@@ -130,25 +148,6 @@ export function AnalysisPage() {
         <ReportSection title="Weaknesses" value={report.data.content.weaknesses} evidence={evidenceByArtifactId} />
         <ReportSection title="Recommendations" value={report.data.content.recommendations} evidence={evidenceByArtifactId} />
         {report.data.limitations.length > 0 && <Alert severity="warning">{report.data.limitations.join(" ")}</Alert>}
-      </Stack></Paper>}
-
-      {summaryVideo.data && <Paper sx={{ p: 2 }}><Stack spacing={2}>
-        <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
-          <Typography variant="h5">Summary video</Typography>
-          <Chip size="small" label={summaryVideo.data.status} color={summaryVideo.data.status === "completed" ? "success" : summaryVideo.data.status === "failed" ? "error" : "default"} />
-        </Stack>
-        {["pending", "processing"].includes(summaryVideo.data.status) && <Stack spacing={1}>
-          <LinearProgress />
-          <Typography color="text.secondary">Creating a silent highlight reel from {summaryVideo.data.selected_segments.length} selected segment{summaryVideo.data.selected_segments.length === 1 ? "" : "s"}…</Typography>
-        </Stack>}
-        {summaryVideo.data.status === "failed" && <Alert severity="error">{summaryVideo.data.error ?? "Summary video generation failed."}</Alert>}
-        {summaryVideo.data.status === "completed" && summaryVideo.data.asset_id && <>
-          <Box component="video" src={summaryVideoUrl(summaryVideo.data.asset_id)} controls playsInline preload="metadata" sx={{ width: "100%", maxHeight: 560, bgcolor: "black" }} />
-          <Stack direction={{ xs: "column", sm: "row" }} spacing={1} sx={{ alignItems: { sm: "center" } }}>
-            <Typography color="text.secondary" sx={{ flexGrow: 1 }}>{formatDuration(summaryVideo.data.duration_seconds ?? 0)} · silent · {summaryVideo.data.selected_segments.length} segment{summaryVideo.data.selected_segments.length === 1 ? "" : "s"}</Typography>
-            <Button component="a" href={summaryVideoUrl(summaryVideo.data.asset_id)} download startIcon={<DownloadIcon />}>Download</Button>
-          </Stack>
-        </>}
       </Stack></Paper>}
 
       {usage.data && <Paper sx={{ p: 2 }}><Typography variant="h5" gutterBottom>Model usage</Typography><Typography>{usage.data.model}</Typography><Typography color="text.secondary">{usage.data.successful_requests} successful · {usage.data.failed_requests} failed · {usage.data.total_tokens.toLocaleString()} tokens · {usage.data.total_cost == null ? "Cost unavailable" : `$${usage.data.total_cost.toFixed(6)}`}</Typography></Paper>}

@@ -7,25 +7,21 @@ import {
   EventAvailableRounded,
   FitnessCenterRounded,
   LocalCafeRounded,
-  LogoutRounded,
-  MenuRounded,
-  NotificationsNoneRounded,
   PetsRounded,
   PlayArrowRounded,
   StarRounded,
   TrendingUpRounded,
   VideoLibraryRounded,
 } from "@mui/icons-material";
-import { Avatar, Badge, Button, Dialog, DialogContent, IconButton, LinearProgress, Snackbar } from "@mui/material";
+import { Avatar, Button, Dialog, DialogContent, IconButton, LinearProgress, Snackbar } from "@mui/material";
 import { useQueries, useQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { useSession } from "../../auth/session";
 import { getSummaryVideo, listVideoAnalyses, summaryVideoUrl } from "../../analysis/api";
 import { listVideos, originalUrl } from "../../videos/api";
 import "./dashboard.css";
 
-const navItems = ["Dashboard", "My lessons", "My horse", "Coaches", "Progress & performance", "Videos & highlights", "Upcoming bookings", "Events & clinics", "My package", "Membership", "Loyalty & rewards", "Messages", "Profile & settings"];
 const products = [
   { name: "Americano", detail: "Classic roast", price: 14, emoji: "☕" },
   { name: "Protein Smoothie", detail: "Berry blast", price: 24, emoji: "🥤" },
@@ -46,11 +42,8 @@ export function DashboardPage() {
   const session = useSession();
   const [cart, setCart] = useState(0);
   const [period, setPeriod] = useState("This month");
-  const [menuOpen, setMenuOpen] = useState(false);
   const [notice, setNotice] = useState("");
   const [videoMode, setVideoMode] = useState<"before" | "after" | null>(null);
-  const firstName = useMemo(() => session.user?.identity.split(/[.@_-]/)[0] || "Rider", [session.user]);
-  const role = session.user?.role === "user" ? "Rider" : session.user?.role || "Rider";
   const act = (message: string) => setNotice(message);
   const videos = useQuery({ queryKey: ["dashboard", session.user?.id, "videos"], queryFn: listVideos });
   const uploadedVideos = videos.data?.items ?? [];
@@ -84,23 +77,7 @@ export function DashboardPage() {
   const activeVideo = videoMode === "after" ? afterSrc : beforeSrc;
 
   return (
-    <div className="hp-dashboard">
-      <aside className={menuOpen ? "hp-sidebar open" : "hp-sidebar"}>
-        <div className="hp-brand"><PetsRounded /><div><b>HORSE PARK</b><span>AL AMMARIYAH</span></div></div>
-        <small className="hp-label">MAIN</small>
-        <nav>{navItems.map((item, index) => <button className={index === 0 ? "active" : ""} key={item} onClick={() => act(`${item} is a demo link`)}><span>{index === 0 ? "⌂" : "◇"}</span>{item}</button>)}</nav>
-        <small className="hp-label">QUICK ACCESS</small>
-        <nav><button onClick={() => act("Lesson booking opened")}><span>＋</span>Book lesson</button><button onClick={() => act("Café menu opened")}><span>♨</span>Order from café <em>NEW</em></button><button onClick={() => act("Coach chat opened")}><span>✉</span>Contact coach</button></nav>
-        <div className="hp-arena"><b>Arena status</b><span><i /> Open</span><p>Main Arena <small>☀</small></p><p>Indoor Arena <small>☀</small></p></div>
-      </aside>
-
-      <main>
-        <header className="hp-header">
-          <IconButton className="hp-menu" onClick={() => setMenuOpen(!menuOpen)}><MenuRounded /></IconButton>
-          <div><h1>Welcome, {firstName} <span>{role}</span></h1><p>Horse Park Rider Dashboard</p></div>
-          <div className="hp-header-actions"><span>☀️ 32°C <small>Al Ammariyah</small></span><Badge badgeContent={3} color="error"><NotificationsNoneRounded /></Badge><Avatar>{firstName[0]?.toUpperCase()}</Avatar><div><b>{firstName}</b><small>{role}</small></div><IconButton onClick={() => void session.logout()} title="Logout"><LogoutRounded /></IconButton></div>
-        </header>
-
+    <>
         <section className="hp-content">
           <div className="hp-topline"><div><h2>Your riding overview</h2><p>Everything you need for a great day at the park.</p></div><Button variant="contained" startIcon={<CalendarMonthRounded />} onClick={() => act("Choose a time for your lesson")}>Book lesson</Button></div>
           <div className="hp-stats"><StatCard icon={<CalendarMonthRounded />} eyebrow="NEXT LESSON" title="Today, 05:00 PM" detail="Flatwork Fundamentals" /><StatCard icon={<PetsRounded />} eyebrow="MY HORSE" title="Zidane" detail="9 yrs · Warmblood" /><StatCard icon={<AccessTimeRounded />} eyebrow="SESSION STARTS IN" title="02 : 15 : 36" detail="Main Arena" /><StatCard icon={<StarRounded />} eyebrow="PACKAGE BALANCE" title="8 lessons" detail="Valid until Jun 30" /></div>
@@ -124,13 +101,12 @@ export function DashboardPage() {
 
           <div className="hp-quick"><button onClick={() => act("Lesson booking opened")}><CalendarMonthRounded /><span><b>Book lesson</b><small>Reserve your next session</small></span></button><button onClick={() => act("Café menu opened")}><LocalCafeRounded /><span><b>Order from café</b><small>Order food & drinks</small></span></button><NavLink to="/app/videos"><VideoLibraryRounded /><span><b>View video</b><small>Watch & analyze rides</small></span></NavLink><button onClick={() => act("Horse profile opened")}><PetsRounded /><span><b>My horse</b><small>View horse profile & care</small></span></button><button onClick={() => act("Progress details opened")}><FitnessCenterRounded /><span><b>Performance</b><small>Track your progress</small></span></button><button onClick={() => act("Coach chat opened")}><EventAvailableRounded /><span><b>Contact coach</b><small>Message your coach</small></span></button></div>
         </section>
-      </main>
       <Dialog open={videoMode !== null} onClose={() => setVideoMode(null)} maxWidth="md" fullWidth slotProps={{ paper: { className: "hp-video-dialog" } }}>
         <div className="hp-video-dialog-head"><div><b>{videoMode === "after" ? "After analysis" : "Before analysis"}</b><small>{sourceVideo?.original_filename}</small></div><IconButton aria-label="Close video" onClick={() => setVideoMode(null)}><CloseRounded /></IconButton></div>
         <DialogContent>{activeVideo && <video key={activeVideo} src={activeVideo} crossOrigin="use-credentials" controls autoPlay playsInline preload="metadata" />}</DialogContent>
         <div className="hp-video-switch"><button className={videoMode === "before" ? "active" : ""} disabled={!beforeSrc} onClick={() => setVideoMode("before")}>Before</button><button className={videoMode === "after" ? "active" : ""} disabled={!afterSrc} onClick={() => setVideoMode("after")}>After</button></div>
       </Dialog>
       <Snackbar open={Boolean(notice)} autoHideDuration={2200} onClose={() => setNotice("")} message={notice} />
-    </div>
+    </>
   );
 }
