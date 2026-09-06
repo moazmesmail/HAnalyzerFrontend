@@ -1,5 +1,5 @@
 import { apiRequest, mediaUrl } from "../../shared/api/client";
-import type { AnalysisProfile, AnalysisReport, AnalysisResults, AnalysisSession, ModelUsage, StructuredAnalysis } from "../../shared/api/generated";
+import type { AnalysisProfile, AnalysisReport, AnalysisResults, AnalysisSession, ModelUsage, StructuredAnalysis, SummaryVideo } from "../../shared/api/generated";
 
 export function listAnalysisProfiles() {
   return apiRequest<AnalysisProfile[]>("/analysis-profiles");
@@ -44,6 +44,21 @@ export function retryAnalysis(sessionId: string, csrfToken: string | null) {
   });
 }
 
+export function getSummaryVideo(sessionId: string) {
+  return apiRequest<SummaryVideo>(`/analyses/${sessionId}/summary-video`);
+}
+
+export function createSummaryVideo(sessionId: string, csrfToken: string | null) {
+  return apiRequest<SummaryVideo>(`/analyses/${sessionId}/summary-video`, {
+    method: "POST",
+    csrfToken
+  });
+}
+
 export function evidenceUrl(assetId: string) {
+  return mediaUrl(assetId);
+}
+
+export function summaryVideoUrl(assetId: string) {
   return mediaUrl(assetId);
 }

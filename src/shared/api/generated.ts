@@ -167,6 +167,27 @@ export type StructuredAnalysis = {
   coverage: AnalysisCoverage;
 };
 
+export type SummaryVideoSegment = {
+  start_seconds: number;
+  end_seconds: number;
+  artifact_ids: string[];
+  titles: string[];
+};
+
+export type SummaryVideo = {
+  id: string;
+  session_id: string;
+  status: "pending" | "processing" | "completed" | "failed";
+  asset_id?: string | null;
+  selected_segments: SummaryVideoSegment[];
+  duration_seconds?: number | null;
+  analysis_revision: number;
+  error?: string | null;
+  created_at: string;
+  started_at?: string | null;
+  completed_at?: string | null;
+};
+
 export type DeepReportContent = {
   executive_summary?: string;
   video_features?: Record<string, unknown>;
