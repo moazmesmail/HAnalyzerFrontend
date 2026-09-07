@@ -1,4 +1,5 @@
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
 import { Alert, Box, Button, Chip, CircularProgress, LinearProgress, Paper, Stack, Typography } from "@mui/material";
 import ReplayIcon from "@mui/icons-material/Replay";
 import MovieCreationIcon from "@mui/icons-material/MovieCreation";
@@ -8,7 +9,7 @@ import { useEffect } from "react";
 import { Link as RouterLink, useNavigate, useParams } from "react-router-dom";
 import { getErrorMessage } from "../../../shared/api/errors";
 import { useSession } from "../../auth/session";
-import { createSummaryVideo, evidenceUrl, getAnalysis, getAnalysisReport, getAnalysisResults, getAnalysisUsage, getStructuredAnalysis, getSummaryVideo, retryAnalysis, summaryVideoUrl } from "../api";
+import { createSummaryVideo, deleteAnalysis, evidenceUrl, getAnalysis, getAnalysisReport, getAnalysisResults, getAnalysisUsage, getStructuredAnalysis, getSummaryVideo, retryAnalysis, summaryVideoUrl } from "../api";
 import { analysisKeys } from "../queries";
 
 export function AnalysisPage() {
@@ -63,6 +64,10 @@ export function AnalysisPage() {
     mutationFn: () => retryAnalysis(sessionId ?? "", auth.csrfToken),
     onSuccess: (newAnalysis) => navigate(`/app/analyses/${newAnalysis.id}`)
   });
+  const remove = useMutation({
+    mutationFn: () => deleteAnalysis(sessionId ?? "", auth.csrfToken),
+    onSuccess: () => navigate(analysis.data ? `/app/videos/${analysis.data.video_id}` : "/app/videos"),
+  });
 
   useEffect(() => {
     if (!terminal || !sessionId) return;
@@ -89,6 +94,7 @@ export function AnalysisPage() {
         disabled={createSummary.isPending || ["pending", "processing"].includes(summaryVideo.data?.status ?? "")}
         onClick={() => createSummary.mutate()}
       >{createSummary.isPending || ["pending", "processing"].includes(summaryVideo.data?.status ?? "") ? "Creating…" : "Create Summary Video"}</Button>}
+      {analysis.data && <Button color="error" startIcon={<DeleteRoundedIcon />} disabled={remove.isPending} onClick={() => { if (window.confirm("Delete this analysis and its generated results?")) remove.mutate(); }}>Delete analysis</Button>}
       {analysis.data && <Chip label={formatStatus(analysis.data.status)} color={analysis.data.status === "failed" ? "error" : analysis.data.status === "completed" ? "success" : "default"} />}
     </Stack>
     {createSummary.isError && <Alert severity="error">{getErrorMessage(createSummary.error)}</Alert>}

@@ -1,3 +1,4 @@
+import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import ArchiveRoundedIcon from "@mui/icons-material/ArchiveRounded";
 import { Alert, Box, Button, Chip, CircularProgress, FormControl, InputLabel, MenuItem, Paper, Select, Stack, Typography } from "@mui/material";
@@ -8,7 +9,7 @@ import { getErrorMessage } from "../../../shared/api/errors";
 import { useSession } from "../../auth/session";
 import { archiveVideo, getVideo, originalUrl } from "../api";
 import { videoKeys } from "../queries";
-import { listAnalysisProfiles, listVideoAnalyses, startAnalysis } from "../../analysis/api";
+import { deleteAnalysis, listAnalysisProfiles, listVideoAnalyses, startAnalysis } from "../../analysis/api";
 import { analysisKeys } from "../../analysis/queries";
 
 export function VideoDetailPage() {
@@ -51,6 +52,10 @@ export function VideoDetailPage() {
       await queryClient.invalidateQueries({ queryKey: videoKeys.list(session.user?.id) });
       navigate("/app/archive");
     },
+  });
+  const deleteAnalysisMutation = useMutation({
+    mutationFn: (sessionId: string) => deleteAnalysis(sessionId, session.csrfToken),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: analysisKeys.video(session.user?.id, videoId) }),
   });
   const currentVideo = video.data;
   const src = currentVideo ? originalUrl(currentVideo) : null;
@@ -102,9 +107,14 @@ export function VideoDetailPage() {
             </Button>
             {analyses.data && analyses.data.length > 0 && <Stack spacing={1}>
               <Typography variant="subtitle1">Previous analyses</Typography>
-              {analyses.data.map((item) => <Button key={item.id} component={RouterLink} to={`/app/analyses/${item.id}`} variant="outlined" sx={{ justifyContent: "space-between" }}>
-                <span>{new Date(item.created_at).toLocaleString()} · {item.terminal_progress_percent}%</span><Chip size="small" label={item.status} />
-              </Button>)}
+              {analyses.data.map((item) => <Stack key={item.id} direction="row" spacing={1}>
+                <Button component={RouterLink} to={`/app/analyses/${item.id}`} variant="outlined" sx={{ justifyContent: "space-between", flexGrow: 1 }}>
+                  <span>{new Date(item.created_at).toLocaleString()} · {item.terminal_progress_percent}%</span><Chip size="small" label={item.status} />
+                </Button>
+                <Button color="error" aria-label="Delete analysis" onClick={() => { if (window.confirm("Delete this analysis and its generated results?")) deleteAnalysisMutation.mutate(item.id); }} disabled={deleteAnalysisMutation.isPending}>
+                  <DeleteRoundedIcon />
+                </Button>
+              </Stack>)}
             </Stack>}
           </Stack>
         </Paper>

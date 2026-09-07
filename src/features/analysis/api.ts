@@ -21,6 +21,10 @@ export function getAnalysis(sessionId: string) {
   return apiRequest<AnalysisSession>(`/analyses/${sessionId}`);
 }
 
+export function deleteAnalysis(sessionId: string, csrfToken: string | null) {
+  return apiRequest<void>(`/analyses/${sessionId}`, { method: "DELETE", csrfToken });
+}
+
 export function getAnalysisResults(sessionId: string) {
   return apiRequest<AnalysisResults>(`/analyses/${sessionId}/results`);
 }
