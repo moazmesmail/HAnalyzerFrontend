@@ -1,4 +1,4 @@
-import { AdminPanelSettingsRounded, AssessmentRounded, DashboardRounded, LogoutRounded, MenuRounded, NotificationsNoneRounded, UploadRounded, VideoLibraryRounded } from "@mui/icons-material";
+import { AdminPanelSettingsRounded, ArchiveRounded, AssessmentRounded, DashboardRounded, FolderCopyRounded, LogoutRounded, MenuRounded, NotificationsNoneRounded, UploadRounded, VideoLibraryRounded } from "@mui/icons-material";
 import { Avatar, Badge, IconButton } from "@mui/material";
 import { useMemo, useState } from "react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
@@ -9,6 +9,8 @@ const riderLinks = [
   { label: "Dashboard", to: "/app/dashboard", icon: <DashboardRounded /> },
   { label: "Analysis dashboard", to: "/app/analysis-dashboard", icon: <AssessmentRounded /> },
   { label: "Videos & highlights", to: "/app/videos", icon: <VideoLibraryRounded /> },
+  { label: "Workspaces", to: "/app/workspaces", icon: <FolderCopyRounded /> },
+  { label: "Archive", to: "/app/archive", icon: <ArchiveRounded /> },
   { label: "Upload video", to: "/app/videos/new", icon: <UploadRounded /> },
 ];
 const demoLinks = ["My lessons", "My horse", "Coaches", "Progress & performance", "Upcoming bookings", "Events & clinics"];
@@ -53,6 +55,8 @@ function pageTitle(pathname: string) {
   if (pathname === "/app/videos/new") return "Upload video";
   if (pathname.startsWith("/app/videos/")) return "Video analysis";
   if (pathname.startsWith("/app/videos")) return "Videos & highlights";
+  if (pathname.startsWith("/app/workspaces")) return "Workspaces";
+  if (pathname.startsWith("/app/archive")) return "Archive";
   if (pathname.startsWith("/app/admin")) return "Registration approvals";
   if (pathname.startsWith("/app/analyses")) return "Performance analysis";
   return "Equestrian Centre";
@@ -60,5 +64,7 @@ function pageTitle(pathname: string) {
 
 function isLinkActive(target: string, pathname: string) {
   if (target === "/app/videos") return pathname === target || (pathname.startsWith("/app/videos/") && pathname !== "/app/videos/new");
+  if (target === "/app/workspaces") return pathname === target || pathname.startsWith("/app/workspaces/");
+  if (target === "/app/archive") return pathname === target;
   return pathname === target;
 }

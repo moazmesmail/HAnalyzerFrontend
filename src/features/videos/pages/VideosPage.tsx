@@ -1,4 +1,5 @@
 import AddIcon from "@mui/icons-material/Add";
+import ArchiveRoundedIcon from "@mui/icons-material/ArchiveRounded";
 import {
   Alert,
   Button,
@@ -13,19 +14,24 @@ import {
   TableRow,
   Typography
 } from "@mui/material";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link as RouterLink } from "react-router-dom";
 import { getErrorMessage } from "../../../shared/api/errors";
 import { useSession } from "../../auth/session";
-import { listVideos } from "../api";
+import { archiveVideo, listVideos } from "../api";
 import { videoKeys } from "../queries";
 
 export function VideosPage() {
   const session = useSession();
+  const queryClient = useQueryClient();
   const videos = useQuery({
     queryKey: videoKeys.list(session.user?.id),
     queryFn: listVideos,
     enabled: Boolean(session.user)
+  });
+  const archive = useMutation({
+    mutationFn: (videoId: string) => archiveVideo(videoId, session.csrfToken),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: videoKeys.list(session.user?.id) }),
   });
 
   const items = videos.data?.items ?? [];
@@ -55,7 +61,7 @@ export function VideosPage() {
                 <TableCell>Uploaded</TableCell>
                 <TableCell>Duration</TableCell>
                 <TableCell>Status</TableCell>
-                <TableCell align="right">Open</TableCell>
+                <TableCell align="right">Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -68,9 +74,8 @@ export function VideosPage() {
                     <Chip size="small" label={video.preparation_status === "uploaded" ? "Uploaded" : video.preparation_status === "ready" ? "Visual input prepared" : video.preparation_status === "preparing" ? "Preparing video" : "Preparation failed"} />
                   </TableCell>
                   <TableCell align="right">
-                    <Button component={RouterLink} to={`/app/videos/${video.id}`}>
-                      Play / Analyze
-                    </Button>
+                    <Button component={RouterLink} to={`/app/videos/${video.id}`}>Play / Analyze</Button>
+                    <Button color="warning" startIcon={<ArchiveRoundedIcon />} onClick={() => archive.mutate(video.id)} disabled={archive.isPending}>Archive</Button>
                   </TableCell>
                 </TableRow>
               ))}

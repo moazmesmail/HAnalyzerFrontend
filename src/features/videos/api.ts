@@ -6,6 +6,18 @@ export function listVideos() {
   return apiRequest<PaginatedResponse<Video>>("/videos");
 }
 
+export function listArchivedVideos() {
+  return apiRequest<PaginatedResponse<Video>>("/videos/archive");
+}
+
+export function archiveVideo(videoId: string, csrfToken: string | null) {
+  return apiRequest<Video>(`/videos/${videoId}/archive`, { method: "POST", csrfToken });
+}
+
+export function restoreVideo(videoId: string, csrfToken: string | null) {
+  return apiRequest<Video>(`/videos/${videoId}/restore`, { method: "POST", csrfToken });
+}
+
 export function getVideo(videoId: string) {
   return apiRequest<Video>(`/videos/${videoId}`);
 }

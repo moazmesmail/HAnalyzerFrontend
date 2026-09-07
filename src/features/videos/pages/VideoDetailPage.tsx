@@ -1,11 +1,12 @@
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import ArchiveRoundedIcon from "@mui/icons-material/ArchiveRounded";
 import { Alert, Box, Button, Chip, CircularProgress, FormControl, InputLabel, MenuItem, Paper, Select, Stack, Typography } from "@mui/material";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Link as RouterLink, useNavigate, useParams } from "react-router-dom";
 import { getErrorMessage } from "../../../shared/api/errors";
 import { useSession } from "../../auth/session";
-import { getVideo, originalUrl } from "../api";
+import { archiveVideo, getVideo, originalUrl } from "../api";
 import { videoKeys } from "../queries";
 import { listAnalysisProfiles, listVideoAnalyses, startAnalysis } from "../../analysis/api";
 import { analysisKeys } from "../../analysis/queries";
@@ -44,6 +45,13 @@ export function VideoDetailPage() {
       navigate(`/app/analyses/${updated.id}`);
     }
   });
+  const archive = useMutation({
+    mutationFn: () => archiveVideo(videoId ?? "", session.csrfToken),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: videoKeys.list(session.user?.id) });
+      navigate("/app/archive");
+    },
+  });
   const currentVideo = video.data;
   const src = currentVideo ? originalUrl(currentVideo) : null;
   const processing = analyze.isPending;
@@ -54,7 +62,7 @@ export function VideoDetailPage() {
       {video.isLoading && <CircularProgress aria-label="Loading video" />}
       {video.isError && <Alert severity="error">{getErrorMessage(video.error)}</Alert>}
       {currentVideo && <>
-        <Typography variant="h4" component="h1" sx={{ overflowWrap: "anywhere" }}>{currentVideo.original_filename}</Typography>
+        <Stack direction={{ xs: "column", sm: "row" }} sx={{ justifyContent: "space-between", alignItems: { xs: "flex-start", sm: "center" }, gap: 1 }}><Typography variant="h4" component="h1" sx={{ overflowWrap: "anywhere" }}>{currentVideo.original_filename}</Typography><Button color="warning" startIcon={<ArchiveRoundedIcon />} onClick={() => archive.mutate()} disabled={archive.isPending}>Archive video</Button></Stack>
         <Paper sx={{ p: 2 }}>
           <Stack spacing={2}>
             <Typography variant="h6">Original video</Typography>

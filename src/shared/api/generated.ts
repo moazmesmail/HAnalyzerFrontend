@@ -34,6 +34,33 @@ export type Video = {
   preparation_retryable?: boolean;
   original_asset_id?: string | null;
   preview_asset_id?: string | null;
+  archived_at?: string | null;
+};
+
+export type Workspace = {
+  id: string;
+  name: string;
+  created_at: string;
+  updated_at: string;
+  video_count: number;
+};
+
+export type WorkspaceVideo = Video & {
+  analysis?: {
+    session_id: string;
+    status: string;
+    summary_video?: {
+      id: string;
+      status: string;
+      asset_id?: string | null;
+      duration_seconds?: number | null;
+      error?: string | null;
+    } | null;
+  } | null;
+};
+
+export type WorkspaceDetail = Workspace & {
+  videos: WorkspaceVideo[];
 };
 
 export type AnalysisProfile = {
